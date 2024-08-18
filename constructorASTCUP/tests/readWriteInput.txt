@@ -1,0 +1,18 @@
+void fun readWrite(rial r){
+    num count -> 0;
+    num n -> readNum();
+    num k -> readNum();
+    rial z -> readRial();
+    writeRial(z);
+    while (count < n){
+	r -> readRial();
+        writeRial(r);
+        count +-> 1;
+    }
+}
+
+num main() {
+    readWrite(3,14);
+
+    return 0;
+}

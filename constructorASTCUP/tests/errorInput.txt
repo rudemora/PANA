@@ -1,0 +1,31 @@
+num x -> 3;
+
+num list pointer punteroL -> new 3 num list(2:2); **error
+
+reg personaT {num edad : bool soltero : rial altura};
+
+personaT list(2 : 1) miArray;
+
+miArray[1:0].edad -> 22;
+miArray[0: (1*2 - 1)].soltero -> infact;
+miArray[1 /: 0].altura -> 1,82; **error
+
+num list(2:3) miArray2 -> [2];
+
+num list(5) fun miFuncionError(){
+	for(num i -> 2 : i << 3 : i++){**error
+
+	}
+}
+
+num main(){
+	personaT Albert;
+	personaT pointer punteroPersona;
+	punteroPersona -> $Albert;
+	if (fact K){ **error
+		num x -> 3;
+	}
+	else {
+	}
+	return 0;
+}

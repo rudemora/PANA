@@ -1,0 +1,20 @@
+num list (11) fun funcion(){
+   num size -> 10;
+   num list (11) array;
+   for(num i -> 1 : i < size : i +-> 1){
+        num x -> 0;
+        loop (i){
+            x +-> i;
+        }
+        array[i] -> x;
+   }
+return array;
+}
+
+num main() {
+   
+   num list (11) array;
+	
+   array -> funcion();
+   return 0;
+}

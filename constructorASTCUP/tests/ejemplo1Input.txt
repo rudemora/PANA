@@ -1,0 +1,37 @@
+typedef num list (4:7:4) as lista;
+
+reg registro {lista l -> [9] : num pointer p : bool ok -> infact};
+
+num fun funcion1 (lista ref l : num n){
+	n -> 0;
+	lista hola -> l;
+	for(num i -> 1 : i <= 4 : i +->1){
+		n +-> hola[i:i:i];
+		writeNum(hola[i:i:i]);
+	} 
+	return n;
+}
+
+
+bool fun funcion2 (){
+	registro r; 
+	num x -> funcion1(r.l : 23);
+	bool resultado;
+	if(x > 8){
+		loop(8){
+			x -> x - 1;
+		}
+		resultado -> fact;
+	}
+	else{
+		resultado -> infact;
+	}
+	(pointer (r.p)) -> x;
+	return resultado;
+}
+
+
+num main(){
+	bool ok -> funcion2();
+	return 0;
+}

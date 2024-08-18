@@ -1,0 +1,22 @@
+reg person {num id -> 52489263 : num phone : num age : rial height : rial weight : bool married};
+
+
+person fun inicializarPersona(person persona){
+
+    persona.married -> readBool();
+    bool x -> fact;
+    if (x == persona.married){
+	 writeBool(persona.married);
+    }
+    persona.phone -> toInt(readRial());
+    persona.age -> toInt(readRial());
+    persona.height -> readRial();
+    persona.weight -> readRial();
+    return persona;
+}
+
+num main() {
+
+    person persona -> inicializarPersona(persona);    
+    return 0; 
+}

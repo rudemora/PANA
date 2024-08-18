@@ -1,0 +1,47 @@
+reg alumno {num edad : bool genero /** 0 si es chico, 1 si es chica **/ : rial list (10) pointer notas};
+
+typedef alumno as aliasAlumno;
+
+typedef rial list(10) as rialList;
+
+typedef rialList pointer as aliasArray;
+
+rial fun mejoresN(rial list(10) lista : num N){
+    rial sol;
+    rial less -> 100,1;
+    for(num i -> 1 : i <= (N + 1) : i +-> 1){
+	sol +-> lista[i];
+	if (less > lista[i]){
+		less -> lista[i];
+	}
+	writeRial(lista[i]);
+    }
+    sol --> less;
+    return sol/toFloat(N);
+}
+
+rial fun inicializarNotas(aliasArray calificaciones){
+    num i -> 1;
+    rial media;
+    loop(4){
+        rial x -> readRial();
+        (pointer calificaciones)[i] -> x;
+	writeRial((pointer calificaciones)[i]);
+        media +-> x;
+        i +-> 1;
+    }
+    return mejoresN( (pointer calificaciones) : 3);
+}
+
+num main(){
+    aliasAlumno ruben;
+    aliasArray list(6) array;
+    readNum();
+    (array[1]) -> new rial list(10);
+    (pointer (array[1]))[6] -> 10,8;
+    ruben.genero -> infact;
+    ruben.notas -> new rial list(10);
+    rial z -> inicializarNotas(ruben.notas);
+    writeRial(z);
+    return toInt(z);
+}

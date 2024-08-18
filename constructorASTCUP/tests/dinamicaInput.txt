@@ -1,0 +1,20 @@
+typedef num list(2:3:1) as miNuevoTipo;
+
+reg registro {num pointer x : miNuevoTipo pointer miArray};
+
+miNuevoTipo pointer fun inicializarRegistro(){ **devolver ALIAS
+	miNuevoTipo pointer lista -> new num list(2:3:1)({readNum() : readNum() : readNum() : 4: 5: 6}); **inicializar dinamica
+	return lista;
+}
+
+num main(){
+	registro registro1;
+	registro1.x -> new num(1);
+	registro1.miArray -> inicializarRegistro();
+        for(num i -> 1: i <= 2 : i -> i + 1) {
+		for(num j -> 1 : j <= 3 : j -> j + 1){
+			writeNum((pointer (registro1.miArray))[i:j:1]);
+		}
+	}
+	return 0;
+}

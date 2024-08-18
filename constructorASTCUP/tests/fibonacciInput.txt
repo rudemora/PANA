@@ -1,0 +1,18 @@
+num fun fibonacci (num x) {
+    num sol;
+    if ((x == 0) @ (x == 1)) {
+        sol -> 1;
+    }
+    else{
+        sol -> fibonacci(x - 1) + fibonacci (x - 2);
+    }
+    return sol;
+}
+		
+num main(){
+    for (num it -> 0 : it <= 10 : it+->1){
+        writeNum(fibonacci(it));
+    }
+
+    return 0;
+}

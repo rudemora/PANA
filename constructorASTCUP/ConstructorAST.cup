@@ -1,0 +1,441 @@
+package constructorast;
+
+import java_cup.runtime.*;
+import alex.AnalizadorLexicoExp;
+import alex.UnidadLexica;
+import alex.TokenValue;
+import errors.GestionErroresExp;
+
+
+import ast.*;
+//import ast.campoP.*;
+import ast.expresionP.*;
+import ast.lineaP.*;
+//import ast.lineaP.declaracionP.*;
+import ast.lineaP.funcionP.*;
+import ast.lineaP.buclesP.*;
+import ast.lineaP.condicionalP.*;
+import ast.tiposP.*;
+//import ast.estructurasP.*;
+
+
+
+
+import java.util.List;
+import java.util.ArrayList;
+
+scan with {: return getScanner().next_token(); :};
+parser code {: 
+   private GestionErroresExp errores;
+   public void syntax_error(Symbol unidadLexica) {
+     errores.errorSintactico((UnidadLexica)unidadLexica);
+   }
+:};
+init with {: 
+   errores = new GestionErroresExp();
+   AnalizadorLexicoExp alex = (AnalizadorLexicoExp)getScanner();
+   alex.fijaGestionErrores(errores);
+:};
+
+
+
+terminal  RIAL, NUM, MAS, MENOS, POR, DIV,  DIVENT, MOD, MAYOR, MENOR, DOSPUNTOS, ASIG, ACCESO, EXCLAM, AND, OR, DOLLAR, MAYORIG, MENORIG, IGUALIG, DISTINTO, SUMAPREF, RESTAPREF, MULTIPREF,DIVIPREF, MODPREF, DIVENTPREF,  CORCHETEAP, CORCHETECIERRE, BOOL, POINTER, LIST, IF, ELSE, FUN, FOR, WHILE, LOOP, REG, REF, NEW, DELETE, VOID;
+
+terminal MAIN, RETURN, PAP, PCIERRE, LLAVEAP, LLAVECIE, TOFLOAT, TOINT, AS, TYPEDEF;
+terminal TokenValue IDEN;
+
+terminal TokenValue READNUM, WRITENUM, READRIAL, WRITERIAL, READBOOL, WRITEBOOL, ENT, FACT, INFACT, REAL, PUNTOCOMA;
+
+
+
+non terminal Programa S;
+non terminal Funcion PROGMAIN;
+non terminal Declaracion DECLARACION;
+non terminal List<Instruccion> LGLOBALES;
+non terminal Funcion FUNCION;
+non terminal Creacion CREACION;
+non terminal Registro REGISTRO;
+non terminal Alias ALIAS;
+non terminal List<Creacion> LCAMPOS;
+non terminal Tipo TIPO;
+
+non terminal List<Argumento> LARGUMENTOS;
+non terminal Argumento ARGUMENTO;
+non terminal List<Ent> VALORES; 
+
+non terminal Instruccion INSTRUCCION;
+non terminal List<Instruccion> LINSTRUCCION;
+non terminal List<Instruccion> DECFUNCION;
+
+non terminal Bucles BUCLES;
+non terminal Declaracion INICIALIZAR;
+
+
+non terminal Condicional CONDICIONAL;
+non terminal List<Condicional2> LCONDICIONAL2;
+non terminal Condicional3 CONDICIONAL3;
+
+
+non terminal List<Expresion> ARGUMENTOS2;
+
+non terminal Llamada LLAMADA;
+
+non terminal Dinamica DINAMICA;
+
+non terminal Asignacion ASIGNACION;
+
+non terminal KindAsig OPASIG;
+
+non terminal Expresion E0, E1, E2, E3, E4, E5, E6, E7, E8, E9;
+non terminal KindAsig OP1, OP2, OP3, OP4;
+non terminal Constante CONSTANTE;
+non terminal Unitario UNITARIO;
+
+non terminal Tipo TIPOSBASICOS;
+
+non terminal List<Expresion> INICIOS;
+non terminal Writes WRITES;
+non terminal Reads READS;
+
+S ::= LGLOBALES:lgobs
+     {: RESULT = new Programa(lgobs); :};
+
+LGLOBALES ::= LGLOBALES:lgobs DECLARACION:decl
+		{: lgobs.add(decl); RESULT = lgobs; :}
+		| LGLOBALES:lgobs FUNCION:fun
+		{: lgobs.add(fun); RESULT = lgobs; :}
+		|LGLOBALES:lgobs PROGMAIN:pmain
+     		{: lgobs.add(pmain); RESULT = lgobs; :}
+		| 
+		{: RESULT = new ArrayList<Instruccion>(); :};
+
+PROGMAIN ::=  NUM MAIN PAP PCIERRE LLAVEAP DECFUNCION:decfun LLAVECIE
+	{:RESULT = new Funcion(new TiposBasicos(KindTipo.NUM), "main", new ArrayList<Argumento> (), decfun); :}
+	| NUM MAIN error LLAVEAP DECFUNCION:decfun LLAVECIE
+	{:System.out.println("ERROR EN MAIN"); RESULT = null; :};
+
+DECLARACION ::= CREACION:creacion PUNTOCOMA
+	{: RESULT = creacion; :}
+	| ALIAS:alias
+	{: RESULT = alias; :}
+	| error PUNTOCOMA:pc
+	{: System.out.println("ERROR EN DECLARACION"); RESULT = null; :};
+
+ALIAS ::= TYPEDEF TIPO:tipo AS IDEN:nombre PUNTOCOMA
+          {:RESULT = new Alias(tipo, nombre.lexema); :};
+
+
+CREACION ::= REGISTRO:reg
+	{: RESULT = reg; :}
+	| TIPO:tipo IDEN:iden
+	{: RESULT = new Creacion(tipo, iden.lexema); :}
+	| TIPO:tipo IDEN:iden ASIG E0:exp0
+	{: RESULT = new Creacion(tipo, iden.lexema, exp0); :};
+
+
+
+REGISTRO ::= REG IDEN:name LLAVEAP LCAMPOS:lcamp CREACION:camp LLAVECIE
+	{: RESULT = new Registro(name.lexema, lcamp, camp); :}; 
+
+LCAMPOS ::= LCAMPOS:lcamp CREACION:camp DOSPUNTOS
+	{: lcamp.add(camp); RESULT = lcamp; :}
+	| 
+	{: RESULT = new ArrayList<Creacion>(); :};
+
+
+
+TIPOSBASICOS ::= IDEN:id
+	{: RESULT = new TipoNombre(id.lexema); :}
+	| NUM
+	{: RESULT = new TiposBasicos(KindTipo.NUM); :}
+	| BOOL
+	{: RESULT = new TiposBasicos(KindTipo.BOOL); :}
+	| RIAL 
+	{: RESULT = new TiposBasicos(KindTipo.RIAL); :}
+	| VOID
+	{: RESULT = new TiposBasicos(KindTipo.VOID); :};
+
+
+TIPO ::= TIPOSBASICOS:tipba
+	{: RESULT = tipba; :}
+	| TIPOSBASICOS:tipba LIST PAP VALORES:valors ENT:e PCIERRE
+	{:valors.add(new Ent(e.lexema)); RESULT = new TipoArray(tipba, valors); :}
+	| TIPO:tipo POINTER
+	{: RESULT = new TipoPuntero(tipo); :}
+	| TIPO:tipba POINTER LIST PAP VALORES:valors ENT:e PCIERRE
+	{:valors.add(new Ent(e.lexema)); RESULT = new ListPuntero(tipba, valors); :};
+
+
+FUNCION ::= TIPO:type FUN IDEN:name PAP LARGUMENTOS:largs PCIERRE LLAVEAP DECFUNCION:decfun LLAVECIE 
+	{: RESULT = new Funcion(type, name.lexema, largs, decfun); :}
+	| TIPO FUN IDEN error LLAVEAP DECFUNCION LLAVECIE
+	{: System.out.println("ERROR EN FUNCION"); RESULT = null; :};
+
+VALORES ::= VALORES:valors ENT:e DOSPUNTOS
+	{: valors.add(new Ent(e.lexema)); RESULT = valors; :}
+	| 
+	{: RESULT = new ArrayList<Ent>(); :};
+
+LARGUMENTOS ::= LARGUMENTOS:largs DOSPUNTOS ARGUMENTO:arg   
+	{: largs.add(arg); RESULT = largs; :}
+	| ARGUMENTO:arg
+	{: RESULT = new ArrayList<Argumento>(); RESULT.add(arg); :}
+	| 
+	{: RESULT = new ArrayList<Argumento>(); :};
+
+ARGUMENTO ::= TIPO:type REF IDEN:name
+	{: RESULT  = new Argumento(type, name.lexema, 1); :}
+	| TIPO:type IDEN:name
+	{: RESULT  = new Argumento(type, name.lexema, 0); :};
+
+
+DECFUNCION ::= LINSTRUCCION:linst
+	{: RESULT = linst; :};
+
+
+LINSTRUCCION ::= LINSTRUCCION:linst INSTRUCCION:inst 
+	{: linst.add(inst); RESULT = linst; :}
+	| 
+	{: RESULT = new ArrayList<Instruccion>(); :};
+
+
+INSTRUCCION ::= CREACION:creacion PUNTOCOMA
+	{: RESULT = creacion; :}
+	| BUCLES:bucles
+	{: RESULT = bucles; :}
+	| CONDICIONAL:cond
+	{: RESULT = cond; :}
+	| LLAMADA:llamada PUNTOCOMA
+	{: RESULT = llamada; :}
+	| DELETE E9:exp0 PUNTOCOMA
+	{: RESULT = new Delete(exp0); :}
+	| ASIGNACION:asig PUNTOCOMA
+	{: RESULT = asig; :}
+	| RETURN E0:exp0 PUNTOCOMA
+	{: RESULT = new Return(exp0); :}
+	| error PUNTOCOMA
+	{: System.out.println("ERROR EN INSTRUCCION"); RESULT = null; :};
+
+
+LLAMADA ::=  IDEN:name PAP ARGUMENTOS2:arg2 PCIERRE
+	{: RESULT = new Llamada(name.lexema, arg2); :}
+	| WRITES:name 
+	{: RESULT = name; :}
+	| READS:name 
+	{: RESULT = name; :};
+	
+ARGUMENTOS2 ::= ARGUMENTOS2:args2 DOSPUNTOS E0:exp0 
+	{: args2.add(exp0); RESULT = args2; :}
+	| E0:exp0
+	{: RESULT = new ArrayList<Expresion>(); RESULT.add(exp0); :}
+	|
+	{: RESULT = new ArrayList<Expresion>(); :};
+
+
+WRITES ::= WRITEBOOL:wb PAP:pap E0:exp0 PCIERRE
+	{: RESULT = new Writes(wb.lexema, new TiposBasicos(KindTipo.BOOL), exp0); :}
+	| WRITERIAL:wr PAP:pap E0:exp0 PCIERRE
+	{: RESULT = new Writes(wr.lexema, new TiposBasicos(KindTipo.RIAL), exp0); :}
+	| WRITENUM:wn PAP:pap E0:exp0 PCIERRE
+	{: RESULT = new Writes(wn.lexema, new TiposBasicos(KindTipo.NUM), exp0); :};
+
+READS ::= READBOOL:rb PAP:pap PCIERRE
+	{: RESULT = new Reads(rb.lexema,new TiposBasicos(KindTipo.BOOL)); :}
+	| READRIAL:rr PAP:pap PCIERRE
+	{: RESULT = new Reads(rr.lexema,new TiposBasicos(KindTipo.RIAL)); :}
+	| READNUM:rn PAP:pap PCIERRE
+	{: RESULT = new Reads(rn.lexema,new TiposBasicos(KindTipo.NUM)); :};
+
+
+BUCLES ::= WHILE PAP E0:exp0 PCIERRE LLAVEAP DECFUNCION:decfun LLAVECIE
+	{: RESULT = new While(exp0, decfun); :}
+	| FOR PAP INICIALIZAR:ini DOSPUNTOS E0:exp0 DOSPUNTOS ASIGNACION:asig PCIERRE LLAVEAP DECFUNCION:decfun LLAVECIE
+	{: RESULT = new For(ini, exp0, decfun, asig); :} //falta asignacion
+	| LOOP PAP E0:exp0 PCIERRE LLAVEAP DECFUNCION:decfun LLAVECIE
+	{: RESULT = new Loop(exp0, decfun); :}
+	| WHILE error LLAVEAP DECFUNCION LLAVECIE 
+	{: System.out.println("ERROR EN WHILE"); RESULT = null; :}
+	| FOR error LLAVEAP DECFUNCION LLAVECIE
+	{: System.out.println("ERROR EN FOR"); RESULT = null; :}
+	| LOOP error LLAVEAP DECFUNCION LLAVECIE
+	{: System.out.println("ERROR EN LOOP"); RESULT = null; :};
+
+
+
+INICIALIZAR ::= CREACION:creac
+	{: RESULT = creac; :}
+	| ASIGNACION:asig
+	{: RESULT = asig; :};
+
+
+CONDICIONAL ::= IF PAP E0:exp0 PCIERRE LLAVEAP DECFUNCION:decfuncion LLAVECIE LCONDICIONAL2:lcond2 CONDICIONAL3:cond3
+	{: RESULT = new Condicional(exp0, decfuncion, lcond2, cond3); :}
+	| IF error LLAVEAP DECFUNCION LLAVECIE LCONDICIONAL2 CONDICIONAL3
+	{: System.out.println("ERROR EN CONDICIONAL"); RESULT = null; :};
+
+
+
+LCONDICIONAL2 ::= LCONDICIONAL2:lcond2 ELSE IF PAP E0:exp0 PCIERRE LLAVEAP DECFUNCION:decfuncion LLAVECIE
+	{: lcond2.add(new Condicional2(exp0, decfuncion)); RESULT = lcond2; :}
+	|
+	{: RESULT = new ArrayList<Condicional2>(); :};
+
+
+
+CONDICIONAL3 ::= ELSE LLAVEAP DECFUNCION:decfuncion LLAVECIE 
+	{: RESULT = new Condicional3(decfuncion); :}
+	| 
+	{: RESULT = null; :};
+
+
+DINAMICA ::=  NEW TIPO:type
+	{: RESULT = new Dinamica(type); :}
+	| NEW TIPO:type PAP E0:exp0 PCIERRE 
+	{: RESULT = new Dinamica(type, exp0); :};
+
+
+ASIGNACION ::= E0:exp0 ASIG E0:exp1 
+	{: RESULT = new Asignacion(exp0, exp1, KindAsig.ASIG); :}
+	| E9:exp0 OPASIG:op E9:exp1
+	{: RESULT = new Asignacion(exp0, new EBin(exp0, exp1, op), KindAsig.ASIG); :}; 
+
+OPASIG ::= SUMAPREF
+	{: RESULT = KindAsig.MAS; :}
+	| RESTAPREF
+	{: RESULT = KindAsig.MENOS; :}
+	| MULTIPREF 
+	{: RESULT = KindAsig.POR; :}
+	| DIVIPREF
+	{: RESULT = KindAsig.DIV; :}
+	| MODPREF 
+	{: RESULT = KindAsig.MOD; :}
+	| DIVENTPREF 
+	{: RESULT = KindAsig.DIVENT; :};
+
+E8 ::= E9:exp1 ACCESO IDEN:iden
+	{: RESULT = new EAccesoStruct(exp1, new Unitario(iden.lexema), KindAsig.ACCESO); :}
+	| E9:exp1
+	{: RESULT = exp1; :};
+
+E7 ::= POINTER E8:exp2
+	{: RESULT = new ExprePointer(exp2, KindAsig.POINTER); :}
+	| DOLLAR E8:exp2
+	{: RESULT = new EUn(exp2, KindAsig.DOLLAR); :}
+	| E8:exp2
+	{: RESULT = exp2; :};
+
+E6 ::= E6:exp2 OP1:op1 E7:exp3
+	{: RESULT = new EBin(exp2, exp3, op1); :}
+	| E7:exp3
+	{: RESULT = exp3; :};
+
+E5 ::= E6:exp3 OP2:op2 E6:exp4
+	{: RESULT = new EBin(exp3, exp4, op2); :}
+	| E6:exp4
+	{: RESULT = exp4; :};
+
+
+E4 ::= E5:exp4 OP3:op3 E4:exp5
+	{: RESULT = new EBin(exp4, exp5, op3); :}
+	| E5:exp5
+	{: RESULT = exp5; :};
+
+E3 ::= E4:exp5 OP4:op4 E4:exp6
+	{: RESULT = new EBin(exp5, exp6, op4); :}
+	| E4:exp6
+	{: RESULT = exp6; :};
+
+E2 ::= EXCLAM E2:exp7
+	{: RESULT = new EUn(exp7, KindAsig.EXCLAM); :}
+	| E3:exp7
+	{: RESULT = exp7; :};
+
+E1 ::= E1:exp7 AND E2:exp8
+	{: RESULT = new EBin(exp7, exp8, KindAsig.AND); :}
+	| E2:exp8
+	{: RESULT = exp8; :};
+
+E0 ::= E0:exp8 OR E1:exp9
+	{: RESULT = new EBin(exp8, exp9, KindAsig.OR); :}
+	| E1:exp9
+	{: RESULT = exp9; :};
+
+
+E9 ::= UNITARIO:uni
+	{: RESULT = uni; :}
+ 	| LLAMADA:call
+	{: RESULT = new ExpLlamada(call); :}
+	| CONSTANTE:cons 
+	{: RESULT = cons; :}
+	| TOFLOAT PAP E0:exp0 PCIERRE 
+	{: RESULT = new EUn(exp0, KindAsig.TOFLOAT); :}
+	| TOINT PAP E0:exp0 PCIERRE
+	{: RESULT = new EUn(exp0, KindAsig.TOINT); :}
+	| E9:exp9 CORCHETEAP INICIOS:la E0:exp0 CORCHETECIERRE 
+	{: la.add(exp0); RESULT = new EAcceso(exp9, la, KindAsig.CORCH); :}
+	| PAP E0:exp0 PCIERRE 
+	{: RESULT = new EUn(exp0, KindAsig.PARE); :}
+	| DINAMICA:dina
+	{: RESULT = dina; :}
+	| LLAVEAP INICIOS:inicios E0:e LLAVECIE
+	{: inicios.add(e); RESULT = new ExpreLlave(inicios, KindAsig.LLAVE); :}
+	| CORCHETEAP E0:exp0 CORCHETECIERRE
+	{: RESULT = new ExpreCorch(exp0, KindAsig.CORCH); :};
+
+
+INICIOS ::= INICIOS:ini E0:exp DOSPUNTOS
+	{: ini.add(exp); RESULT = ini; :}
+	|
+	{: RESULT = new ArrayList<Expresion>(); :};
+
+/*LISTAACCESOS ::= LISTAACCESOS:la E0:exp0 DOSPUNTOS
+	{: la.add(exp0); RESULT = la; :}
+	 | 
+	{: RESULT = new ArrayList<Expresion>(); :};
+*/
+OP1 ::= POR 
+	{: RESULT = KindAsig.POR; :}
+	| DIVENT
+	{: RESULT = KindAsig.DIVENT; :}
+ 	| MOD
+	{: RESULT = KindAsig.MOD; :}
+	| DIV 
+	{: RESULT = KindAsig.DIV; :};
+
+
+OP2 ::= MAS 
+	{: RESULT = KindAsig.MAS; :}
+	| MENOS 
+	{: RESULT = KindAsig.MENOS; :};
+
+
+OP3 ::= MAYOR 
+	{: RESULT = KindAsig.MAYOR; :}
+	| MENOR 
+	{: RESULT = KindAsig.MENOR; :}
+	| MAYORIG
+	{: RESULT = KindAsig.MAYORIG; :}
+	| MENORIG
+	{: RESULT = KindAsig.MENORIG; :};
+
+
+OP4 ::= IGUALIG 
+	{: RESULT = KindAsig.IGUALIG; :}
+	| DISTINTO
+	{: RESULT = KindAsig.DISTINTO; :};
+
+UNITARIO ::= IDEN:id
+	{: RESULT = new Unitario(id.lexema); :};
+
+CONSTANTE ::= ENT:e
+	    {: RESULT = new Ent(e.lexema); :}
+	    | REAL:r
+	    {: RESULT = new Real(r.lexema); :}
+	    | FACT:f
+	    {: RESULT = new Bool(f.lexema); :}
+	    | INFACT:i
+	    {: RESULT = new Bool(i.lexema); :};
+
+	
+
+	

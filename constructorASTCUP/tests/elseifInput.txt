@@ -1,0 +1,31 @@
+void fun funcion(num x){
+	num result -> 0;
+	if (x < 0){
+		result -> 0;
+	}
+	else if (x < 8){
+		result -> 8;
+	}
+	else if (x < 15){
+		if (x < 13){
+			result -> 13;
+		}
+		else if(x < 11){
+			result -> 10;
+		}
+		else{
+			result -> 9;
+		}	
+	}
+	else{
+		result -> x;
+	}
+	writeNum(x);
+	writeNum(result);
+}
+
+num main(){
+	num x -> readNum();
+	funcion(x);
+	return 0;
+}

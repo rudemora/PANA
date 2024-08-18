@@ -1,0 +1,37 @@
+bool global -> fact;
+
+rial fun opFloats(rial x){
+	rial resultado -> 10,1;
+
+	if(x > 4,5){
+		resultado -> resultado / toFloat(5);
+		global -> infact;
+	}
+	else if(x > toFloat(3)){
+		resultado -> resultado * toFloat(2);
+	}
+	else{
+		resultado -> toFloat(toInt(resultado + 7,3) // 4);
+	}
+
+	return resultado;
+}
+
+num main(){
+	rial list(3) pointer lista -> new rial list(3);
+	rial x -> 2,5;
+	writeRial(opFloats(x));
+	(pointer lista)[1] -> x;
+
+	x-> 3,8;
+	writeRial(opFloats(x));
+	(pointer lista)[2] -> x;
+
+	x-> toFloat(7);
+	writeRial(opFloats(x));
+	(pointer lista)[2] -> x;
+	
+	writeBool(global);
+	delete lista;
+	return 0;
+}

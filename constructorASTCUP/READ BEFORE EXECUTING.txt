@@ -1,0 +1,39 @@
+#COMMANDS FOR EXECUTING INPUT AND OUTPUT FILES TO OBTAIN THE AST (WINDOWS)
+
+DINAMICA: use main-memory-readNUM.js
+java -cp "./cup.jar;." constructorast.Main tests/dinamicaInput.txt > tests/dinamicaOutput.txt
+
+ALUMNO: use main-memory-readRIAL.js 
+java -cp "./cup.jar;." constructorast.Main tests/alumnoInput.txt > tests/alumnoOutput.txt
+
+EJEMPLO1:
+java -cp "./cup.jar;." constructorast.Main tests/ejemplo1Input.txt > tests/ejemplo1Output.txt
+
+EJEMPLO2:
+java -cp "./cup.jar;." constructorast.Main tests/ejemplo2Input.txt > tests/ejemplo2Output.txt
+
+EJEMPLO3:
+java -cp "./cup.jar;." constructorast.Main tests/ejemplo3Input.txt > tests/ejemplo3Output.txt
+
+FIBONACCI:
+java -cp "./cup.jar;." constructorast.Main tests/fibonacciInput.txt > tests/fibonacciOutput.txt
+
+PERSON: use main-memory-readNUM.js
+java -cp "./cup.jar;." constructorast.Main tests/personInput.txt > tests/personOutput.txt
+
+READ-WRITE: use main-memory-readRIAL.js 
+java -cp "./cup.jar;." constructorast.Main tests/readWriteInput.txt > tests/readWriteOutput.txt
+
+ARRAY:
+java -cp "./cup.jar;." constructorast.Main tests/arrayInput.txt > tests/arrayOutput.txt
+
+ERROR:
+java -cp "./cup.jar;." constructorast.Main tests/errorInput.txt > tests/errorOutput.txt
+
+PRUEBA:
+java -cp "./cup.jar;." constructorast.Main tests/pruebaInput.txt > tests/pruebaOutput.txt
+
+ELSEIF: use main-memory-readNUM.js
+java -cp "./cup.jar;." constructorast.Main tests/elseifInput.txt > tests/elseifOutput.txt
+
+

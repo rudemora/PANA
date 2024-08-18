@@ -1,0 +1,20 @@
+typedef num pointer list (3) pointer as alias;
+
+num pointer list (3) pointer fun funcion(){
+	alias lista -> new num pointer list(3);
+	num i -> 1;
+	while(i < 4){
+		(pointer lista)[i] -> new num (i);
+		writeNum(pointer ((pointer lista)[i]));
+		i +-> 1;
+	}
+	**delete lista
+	return lista;
+}
+
+num main(){
+
+	alias var -> funcion();
+	delete ((pointer var)[2]);
+	return 7;
+}
